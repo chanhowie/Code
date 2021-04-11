@@ -4,7 +4,7 @@
 int FindNumber(int ch1[], int size);
 int main()
 {
-	int arr1[] = { 2,1,6,1,4,3,5};//数组长度7   只允许出现1-6中的数字
+	int arr1[] = { 2,1,0,3,3,4,5};
 	int size = sizeof(arr1) / sizeof(arr1[0]);
 	int receive = FindNumber(arr1, size);
 	printf("receive = %d", receive);
@@ -22,37 +22,22 @@ int FindNumber(int ch1[],int size)
 		if (ch1[i]<min)
 			min = ch1[i];
 	}
-	if (min<1||max > size - 1)
+	if (max > size - 2)
 		return -1;//数组错
 //	printf("max %d   min %d", max, min); 
+
 	int middle = (max+min) / 2;//中位数
 	int count = 0;
-	int all = 0;
 	//遍历中位数以前的数字总个数
-	while (min != max)
+	for (i = 0; i < size; i++)
 	{
-		count = 0;
-		all = 0;
-		for (i = 0; i < size; i++)
-		{
-			if (ch1[i] >= min&&ch1[i] <= max)
-			{
-				all++;
-				if (ch1[i] <= middle)
-					count++;//
-			}
-		}
-		if (count >(all-count))//只看前面
-		{
-			max = middle;
-			middle = (middle + min) / 2;
-		}
-		else//出现在后面		
-		{
-			min = middle + 1;
-			middle = (middle+1 + max) / 2;
-		}
-		//一次循环
+		if (ch1[i] <= middle)
+			count++;
 	}
-	return min;
+	if (count <(size-middle))//出现在中位数前半部分
+		middle = (i+middle)/2;//查询前半部分
+
+	else
+		i = middle;
+	return 0;
 }
