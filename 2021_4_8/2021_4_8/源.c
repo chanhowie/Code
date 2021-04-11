@@ -45,7 +45,7 @@ int FindNumber(int arr1[], int size)
 		while (arr1[i] != i)
 		{
 			if (arr1[tmp] == arr1[i])
-				return arr1[i];//返回相同的
+				return arr1[i];//返回1说明找到相同的
 			tmp = arr1[i];
 			arr1[i] = arr1[tmp];
 			arr1[tmp] = tmp;
