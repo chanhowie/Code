@@ -4,7 +4,7 @@
 void find(char[], int size);
 int main()
 {
-	char arr1[30] = { "12121212 454545" };
+	char arr1[30] = { "1 1" };
 	//	scanf("%s", &arr1);
 	//	printf("\n%s", arr1);//   遇到空格会不能输入
 
@@ -48,7 +48,7 @@ void find(char ch1[], int size)
 			//			printf("测试%s\n", ch1);//   遇到空格会不能输入
 			if (ch1[i] == ' ')
 			{
-				ch1[i] = '3';
+				ch1[i] = '0';
 				ch1[i - 1] = '2';
 				ch1[i - 2] = '%';
 				i -= 2;
