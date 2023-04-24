@@ -1,0 +1,152 @@
+#include <iostream>
+using namespace std;
+typedef int Status;
+#define OK 1
+#define ERROR 0
+#define MAXSIZE 100
+typedef int ElemType;
+/*
+C/C++语言中的int类型能表示的整数范围是-2^31~2^31-1,unsigned int类型能表示的整数范围是0~2^32-1,即0~4 294 967 295，
+所以，int和unsigned int类型都不能存储超过10位的整数。有些问题需要处理的整数远远不止10位，这种大整数用C/C++语言的基本数据
+类型无法直接表示。请编写算法，采用顺序表或者单链表实现两个大整数相加运算。
+
+提示：将用户输入的十进制整数字符串转化为顺序表或者带头结点的单链表，每个数据元素或每个结点中存放一个整数位，然后总结按位相
+加的运算规律写出程序。
+
+请将源程序文件（.cpp）以附件的形式上传至答题区。
+*/
+typedef struct Lnode {
+	ElemType data;
+	Lnode* next;
+}Lnode, * LnodeList;
+LnodeList InitLnode(Lnode*& L)
+{
+	L = new Lnode;
+	L->data = -1;
+	L->next = NULL;
+	return L;
+}
+bool IsInteger(char number[])
+{
+	for (int i = 0; number[i] != 0; i++)
+	{
+		if (number[i] < '0' || number[i] >'9')
+		{
+			return false;
+		}
+	}
+	return true;
+}
+Lnode* CreatIntegerList(Lnode*& L, char number[])
+{
+	Lnode* p = L;
+	for (int i = 0; number[i] != 0; i++)
+	{
+		Lnode* newNode = new Lnode;
+		newNode->data = number[i] - 48;
+		newNode->next = L->next;
+		L->next = newNode;
+	}
+	return L;
+}
+Status AddLnode(Lnode* L1, Lnode* L2)
+{
+	char number1[MAXSIZE];
+	char number2[MAXSIZE];
+	cout << "请输入第一个整数";
+	cin >> number1;
+	cout << "请输入第二个整数";
+	cin >> number2;
+	//检查数据
+	if (!IsInteger(number1))
+	{
+		cout << "第一次输入的输入的不是整数，请重新输入！";
+		return ERROR;
+	}
+	if (!IsInteger(number2))
+	{
+		cout << "第二次输入的不是整数，请重新输入！";
+		return ERROR;
+	}
+	L1 = CreatIntegerList(L1, number1);
+	L2 = CreatIntegerList(L2, number2);
+	return OK;
+}
+Lnode* GetAddResult(Lnode* L1, Lnode* L2)
+{
+	Lnode* result;
+	result = InitLnode(result);
+	Lnode* resultp = result;
+	Lnode* L1p = L1->next;
+	Lnode* L2p = L2->next;
+	bool carrying = false;
+
+	int resultdata = 0;
+	while (L1p && L2p)
+	{
+		resultdata = L1p->data + L2p->data;
+		if (resultdata > 9)
+		{
+			resultdata = resultdata % 10;
+			//创建节点
+			Lnode* newNode = new Lnode;
+			newNode->data = resultdata+carrying;
+			newNode->next = resultp->next;	
+			resultp->next = newNode;
+			//改变标志位，供下次使用
+			carrying = true;
+		}
+		else
+		{
+			//创建节点
+			Lnode* newNode = new Lnode;
+			newNode->data = resultdata + carrying;
+			newNode->next = NULL;
+			newNode->next = resultp->next;
+			resultp->next = newNode;			
+			carrying = false;
+		}
+		L1p = L1p->next;
+		L2p = L2p->next;
+	}
+	while (L1p)
+	{
+		//创建节点
+		Lnode* newNode = new Lnode;
+		newNode->data = L1p->data + carrying;
+		newNode->next = NULL;
+		newNode->next = resultp->next;
+		resultp->next = newNode;
+		carrying = false;	
+		L1p = L1p->next;
+	}
+	while (L2p)
+	{
+		//创建节点
+		Lnode* newNode = new Lnode;
+		newNode->data = L2p->data + carrying;
+		newNode->next = NULL;
+		newNode->next = resultp->next;
+		resultp->next = newNode;
+		carrying = false;
+		L2p = L2p->next;
+	}
+	return result;
+}
+
+int main()
+{
+	LnodeList L1;
+	L1 = InitLnode(L1);
+	LnodeList L2;
+	L2 = InitLnode(L2);
+	AddLnode(L1, L2);
+	Lnode*p=GetAddResult(L1, L2);
+	p = p->next;
+	while (p)
+	{
+		cout << p->data;
+		p = p->next;
+	}
+	return 0;
+}
