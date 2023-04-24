@@ -1,0 +1,211 @@
+#include <iostream>
+using namespace std;
+typedef int Status;
+#define OK 1
+typedef int ElemType;
+
+/*基于链式存储结构实现两个多项式的乘法问题，例如多项式A = 2x3 + 3x + 1，多项式B = 5x4 + 2x3 - 3x2 – 3，
+则A * B = 10x7 + 4x6 + 9x5 + 11x4 -13x3 – 3x2 – 9x – 3。请将源程序文件（.cpp）以附件的形式上传至答题区。*/
+
+typedef struct Lnode {
+	ElemType base;
+	ElemType exponential;
+	Lnode* next;
+}Lnode, * LnodeList;
+
+LnodeList InitLnode(LnodeList& L)
+{
+	L = new Lnode;
+	L->base = 0;
+	L->exponential = 0;
+	L->next = NULL;
+	return L;
+}
+
+LnodeList InputEquation()
+{
+	LnodeList L1;
+	L1 = InitLnode(L1);
+
+	int base;
+	int exponential;
+	Lnode* p = L1;
+
+	while (true)
+	{
+		Lnode* newNode;
+		newNode = new Lnode;
+		cout << "请输入底数";
+		cin >> base;
+		cout << "请输入指数";
+		cin >> exponential;
+
+		if (base != 0)
+		{
+			newNode->base = base;
+			newNode->exponential = exponential;
+			newNode->next = NULL;
+			p->next = newNode;
+			//L1.base作为链表的长度使用
+			L1->base++;
+			p = p->next;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return L1;
+}
+
+LnodeList CombiningSimilarTerms(Lnode*& L)
+{
+	//合并同类项(包含头节点)
+	int exponentialarr[100] = { 0 };
+	Lnode* p = L->next;
+	int i = 0;
+	while (p)
+	{
+		exponentialarr[i] = p->exponential;
+		p = p->next;
+		i++;
+	}
+	//系数已经都在数组中
+
+	p = L->next;
+	Lnode* q = L->next;
+	Lnode* qprior = L->next;
+
+	for (i = 0; i < L->base; i++)//i是前面那个
+	{
+		for (int j = i + 1; j < L->base; j++)//j是后面那个
+		{
+			if (exponentialarr[i] == exponentialarr[j])
+			{
+				p = L->next;
+				Lnode* q = L->next;
+				//指数相同  把后面底数加到前面的底数，并且后面的底数清零
+				while (p)
+				{
+					if (p->exponential == exponentialarr[i])//p找到了前面的
+					{
+						break;
+					}
+					p = p->next;
+				}
+				qprior = p;
+				q = p->next;
+				while (q)
+				{
+					if (q->exponential == exponentialarr[i])//p找到了前面的
+					{
+						p->base = p->base + q->base;
+						q->base = 0;
+						q->exponential = 0;
+						qprior->next = q->next;
+						delete q;
+						break;
+					}
+					q = q->next;
+					qprior = qprior->next;
+				}
+			}
+		}
+	}
+	L->next = q;
+	return L;
+}
+
+LnodeList multiplication(Lnode* L1, Lnode* L2)
+{
+	Lnode* L;
+	InitLnode(L);
+	Lnode* L1p = L1->next;
+	Lnode* L2p = L2->next;
+	Lnode* p = L;
+
+	while (L1p)
+	{
+		L2p = L2->next;
+		while (L2p)
+		{
+			Lnode* newNode = new Lnode;
+			int base;
+			int exponential;
+			newNode->base = L1p->base * L2p->base;
+			newNode->exponential = L1p->exponential + L2p->exponential;
+			newNode->next = NULL;
+			L2p = L2p->next;
+			p->next = newNode;
+			p = p->next;
+			L->base++;
+		}
+		L1p = L1p->next;
+	}
+	return L;
+}
+
+void displaynode(const Lnode* L)
+{
+	const Lnode* p;
+	p = L->next;
+	while (p)
+	{
+		if (p->base != 0)
+		{
+			if (p->exponential == 0)
+			{
+				cout << p->base;
+			}
+			else if (p->exponential == 1)
+			{
+				cout << p->base << "x";
+			}
+			else
+			{
+				cout << p->base << "x^" << p->exponential;
+			}
+			p = p->next;
+			if (p)
+			{
+				if (p->base >= 0)
+				{
+					cout << "+";
+				}
+			}
+		}
+	}
+	cout << endl;
+}
+
+int main()
+{
+	cout << "输入第一个方程" << endl;
+	Lnode* L1 = InputEquation();
+	cout << "输入第二个方程" << endl;
+	Lnode* L2 = InputEquation();
+
+	Lnode* p = L1->next;
+	displaynode(p);
+
+	p = L2->next;
+	displaynode(p);
+
+	CombiningSimilarTerms(L1);
+	cout << "多项式1合并同类项后";
+	p = L1->next;
+	displaynode(p);
+
+	L2 = CombiningSimilarTerms(L2);
+	cout << "多项式2合并同类项后";
+	p = L2->next;
+	displaynode(p);
+
+	p = multiplication(L1, L2);
+	displaynode(p);
+	p = CombiningSimilarTerms(p);
+	cout << "多项式相乘结果" << endl;
+	displaynode(p);
+
+	return 0;
+}
